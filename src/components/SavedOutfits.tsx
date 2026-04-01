@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion';
-import { Trash2, Calendar } from 'lucide-react';
+import { Trash2, Calendar, Heart } from 'lucide-react';
 import type { Outfit, ClothingItem } from '@/types/closet';
-import { CATEGORY_LABELS } from '@/types/closet';
 
 interface SavedOutfitsProps {
   outfits: Outfit[];
@@ -30,25 +29,16 @@ export function SavedOutfits({ outfits, getItemById, onRemove }: SavedOutfitsPro
           transition={{ delay: i * 0.05 }}
           className="group relative rounded-2xl bg-card shadow-soft overflow-hidden"
         >
-          {/* Mini preview of items */}
           <div className="relative h-48 bg-muted/30 flex items-center justify-center gap-1 p-4 overflow-hidden">
             {outfit.items.slice(0, 5).map((oi, idx) => {
               const item = getItemById(oi.clothingId);
               if (!item) return null;
               return (
-                <img
-                  key={idx}
-                  src={item.imageData}
-                  alt={item.name}
-                  className="h-24 w-auto object-contain"
-                />
+                <img key={idx} src={item.imageData} alt={item.name} className="h-24 w-auto object-contain" />
               );
             })}
-            {outfit.items.length === 0 && (
-              <p className="text-xs text-muted-foreground">Empty outfit</p>
-            )}
+            {outfit.items.length === 0 && <p className="text-xs text-muted-foreground">Empty outfit</p>}
           </div>
-
           <div className="p-4 flex items-center justify-between">
             <div>
               <h3 className="font-heading font-semibold text-foreground">{outfit.name}</h3>
@@ -71,5 +61,3 @@ export function SavedOutfits({ outfits, getItemById, onRemove }: SavedOutfitsPro
     </div>
   );
 }
-
-import { Heart } from 'lucide-react';
