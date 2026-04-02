@@ -31,6 +31,7 @@ export function UploadModal({ open, onClose, onUpload }: UploadModalProps) {
   const [imageData, setImageData] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [converting, setConverting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (file: File) => {
