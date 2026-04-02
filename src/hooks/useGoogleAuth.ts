@@ -53,7 +53,7 @@ export function useGoogleAuth() {
   }, []);
 
   const signIn = useCallback(() => {
-    if (!ready || !GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE') {
+    if (!ready || !GOOGLE_CLIENT_ID) {
       alert('Please set your Google Client ID in src/config.ts');
       return;
     }
