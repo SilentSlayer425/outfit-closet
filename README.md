@@ -52,7 +52,6 @@ src/
 
 Almost everything customizable lives in **`src/config.ts`**. Open that file to change:
 
-- `GOOGLE_CLIENT_ID` — your Google OAuth client ID
 - `CANVAS_MIN_HEIGHT` — how tall the outfit builder canvas is
 - `ARROW_KEY_STEP` — how many pixels arrow keys move items
 - `ITEM_BASE_SIZE` — default size of items on the canvas
@@ -78,41 +77,6 @@ Edit `src/index.css` to change the color palette. Colors use HSL format:
 Fonts are set in `src/index.css`:
 - Headings: **Playfair Display** (serif) — change `--font-heading`
 - Body: **Nunito** (sans-serif) — change `--font-body`
-
-Update the Google Fonts import URL at the top of the file to match.
-
-## Setup
-
-### 1. Install dependencies
-
-```bash
-npm install
-```
-
-### 2. Set up Google OAuth
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a project → Enable **Google Drive API**
-3. Go to **APIs & Services → Credentials → Create OAuth 2.0 Client ID**
-4. Type: Web application
-5. Add `http://localhost:5173` to Authorized JavaScript origins AND redirect URIs
-6. Copy the Client ID
-
-### 3. Add your Client ID
-
-Open `src/config.ts` and replace:
-
-```ts
-export const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID_HERE';
-```
-
-### 4. Run
-
-```bash
-npm run dev
-```
-
-Visit `http://localhost:5173`
 
 ## Tech Stack
 

@@ -59,9 +59,6 @@ export default function Login({ onSignIn, loading }: LoginPageProps) {
           {loading ? 'Signing in...' : 'Sign in with Google'}
         </Button>
 
-        <p className="text-xs text-muted-foreground mt-6">
-          Your closet data syncs to Google Drive
-        </p>
       </motion.div>
     </div>
   );
