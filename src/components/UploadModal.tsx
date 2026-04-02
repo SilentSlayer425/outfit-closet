@@ -34,22 +34,31 @@ export function UploadModal({ open, onClose, onUpload }: UploadModalProps) {
   const [converting, setConverting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     setFileError(null);
     const ext = file.name.toLowerCase();
 
-    // Check for known unsupported extensions (HEIC/HEIF)
-    if (UNSUPPORTED_NAMES.some(u => ext.endsWith(u))) {
-      setFileError(
-        `${file.name.split('.').pop()?.toUpperCase()} files are not supported by browsers. Please convert to JPG or PNG first (e.g. using your phone's share/export or an online converter).`
-      );
+    // Convert HEIC/HEIF to JPEG using heic2any
+    if (HEIC_EXTENSIONS.some(u => ext.endsWith(u)) || file.type === 'image/heic' || file.type === 'image/heif') {
+      setConverting(true);
+      try {
+        const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
+        const resultBlob = Array.isArray(blob) ? blob[0] : blob;
+        const reader = new FileReader();
+        reader.onload = (e) => { setImageData(e.target?.result as string); setConverting(false); };
+        reader.onerror = () => { setFileError('Failed to convert HEIC file.'); setConverting(false); };
+        reader.readAsDataURL(resultBlob);
+      } catch {
+        setFileError('Failed to convert HEIC/HEIF file. Please try converting it manually to JPG.');
+        setConverting(false);
+      }
       return;
     }
 
     // Check MIME type
     if (!file.type.startsWith('image/') && !SUPPORTED_TYPES.has(file.type)) {
       setFileError(
-        `"${file.type || 'unknown'}" is not a supported image format. Supported: JPG, PNG, WebP, GIF, BMP, SVG, AVIF, TIFF.`
+        `"${file.type || 'unknown'}" is not a supported image format. Supported: JPG, PNG, WebP, GIF, BMP, SVG, AVIF, TIFF, HEIC/HEIF.`
       );
       return;
     }
