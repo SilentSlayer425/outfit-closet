@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Upload, AlertTriangle } from 'lucide-react';
+import { X, Upload, AlertTriangle, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import heic2any from 'heic2any';
 import type { ClothingCategory } from '@/types/closet';
 import { CATEGORY_LABELS, CATEGORY_ORDER } from '@/types/closet';
 
@@ -12,10 +13,11 @@ import { CATEGORY_LABELS, CATEGORY_ORDER } from '@/types/closet';
 const SUPPORTED_TYPES = new Set([
   'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/bmp',
   'image/svg+xml', 'image/avif', 'image/tiff',
+  'image/heic', 'image/heif',
 ]);
 
-// Extensions that browsers can't decode (HEIC/HEIF from iPhones, etc.)
-const UNSUPPORTED_NAMES = ['.heic', '.heif'];
+// Extensions that need client-side conversion via heic2any
+const HEIC_EXTENSIONS = ['.heic', '.heif'];
 
 interface UploadModalProps {
   open: boolean;
@@ -29,24 +31,34 @@ export function UploadModal({ open, onClose, onUpload }: UploadModalProps) {
   const [imageData, setImageData] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [converting, setConverting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     setFileError(null);
     const ext = file.name.toLowerCase();
 
-    // Check for known unsupported extensions (HEIC/HEIF)
-    if (UNSUPPORTED_NAMES.some(u => ext.endsWith(u))) {
-      setFileError(
-        `${file.name.split('.').pop()?.toUpperCase()} files are not supported by browsers. Please convert to JPG or PNG first (e.g. using your phone's share/export or an online converter).`
-      );
+    // Convert HEIC/HEIF to JPEG using heic2any
+    if (HEIC_EXTENSIONS.some(u => ext.endsWith(u)) || file.type === 'image/heic' || file.type === 'image/heif') {
+      setConverting(true);
+      try {
+        const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
+        const resultBlob = Array.isArray(blob) ? blob[0] : blob;
+        const reader = new FileReader();
+        reader.onload = (e) => { setImageData(e.target?.result as string); setConverting(false); };
+        reader.onerror = () => { setFileError('Failed to convert HEIC file.'); setConverting(false); };
+        reader.readAsDataURL(resultBlob);
+      } catch {
+        setFileError('Failed to convert HEIC/HEIF file. Please try converting it manually to JPG.');
+        setConverting(false);
+      }
       return;
     }
 
     // Check MIME type
     if (!file.type.startsWith('image/') && !SUPPORTED_TYPES.has(file.type)) {
       setFileError(
-        `"${file.type || 'unknown'}" is not a supported image format. Supported: JPG, PNG, WebP, GIF, BMP, SVG, AVIF, TIFF.`
+        `"${file.type || 'unknown'}" is not a supported image format. Supported: JPG, PNG, WebP, GIF, BMP, SVG, AVIF, TIFF, HEIC/HEIF.`
       );
       return;
     }
@@ -113,7 +125,7 @@ export function UploadModal({ open, onClose, onUpload }: UploadModalProps) {
               </Alert>
             )}
 
-            {/* Drop zone — accepts common image formats */}
+            {/* Drop zone — accepts common image formats + HEIC/HEIF (auto-converted) */}
             <div
               className={`relative mb-4 rounded-xl border-2 border-dashed transition-colors cursor-pointer overflow-hidden ${
                 dragOver ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
@@ -123,19 +135,24 @@ export function UploadModal({ open, onClose, onUpload }: UploadModalProps) {
               onDrop={handleDrop}
               onClick={() => fileRef.current?.click()}
             >
-              {imageData ? (
+              {converting ? (
+                <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="text-sm font-medium">Converting HEIC…</span>
+                </div>
+              ) : imageData ? (
                 <img src={imageData} alt="Preview" className="w-full h-full object-contain" />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
                   <Upload className="w-8 h-8" />
                   <span className="text-sm font-medium">Drop a photo or tap to browse</span>
-                  <span className="text-xs text-muted-foreground/70">JPG, PNG, WebP, GIF, BMP, AVIF, TIFF</span>
+                  <span className="text-xs text-muted-foreground/70">JPG, PNG, WebP, GIF, HEIC/HEIF, BMP, AVIF, TIFF</span>
                 </div>
               )}
               <input
                 ref={fileRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/svg+xml,image/avif,image/tiff"
+                accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/svg+xml,image/avif,image/tiff,image/heic,image/heif,.heic,.heif"
                 className="hidden"
                 onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
               />
