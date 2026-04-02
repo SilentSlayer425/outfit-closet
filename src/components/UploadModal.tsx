@@ -125,7 +125,7 @@ export function UploadModal({ open, onClose, onUpload }: UploadModalProps) {
               </Alert>
             )}
 
-            {/* Drop zone — accepts common image formats */}
+            {/* Drop zone — accepts common image formats + HEIC/HEIF (auto-converted) */}
             <div
               className={`relative mb-4 rounded-xl border-2 border-dashed transition-colors cursor-pointer overflow-hidden ${
                 dragOver ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50'
@@ -135,19 +135,24 @@ export function UploadModal({ open, onClose, onUpload }: UploadModalProps) {
               onDrop={handleDrop}
               onClick={() => fileRef.current?.click()}
             >
-              {imageData ? (
+              {converting ? (
+                <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                  <span className="text-sm font-medium">Converting HEIC…</span>
+                </div>
+              ) : imageData ? (
                 <img src={imageData} alt="Preview" className="w-full h-full object-contain" />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full gap-2 text-muted-foreground">
                   <Upload className="w-8 h-8" />
                   <span className="text-sm font-medium">Drop a photo or tap to browse</span>
-                  <span className="text-xs text-muted-foreground/70">JPG, PNG, WebP, GIF, BMP, AVIF, TIFF</span>
+                  <span className="text-xs text-muted-foreground/70">JPG, PNG, WebP, GIF, HEIC/HEIF, BMP, AVIF, TIFF</span>
                 </div>
               )}
               <input
                 ref={fileRef}
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/svg+xml,image/avif,image/tiff"
+                accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,image/svg+xml,image/avif,image/tiff,image/heic,image/heif,.heic,.heif"
                 className="hidden"
                 onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
               />
