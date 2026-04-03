@@ -109,8 +109,10 @@ export function UploadModal({ open, onClose, onUpload }: UploadModalProps) {
     }
 
     const reader = new FileReader();
-    reader.onload = (e) => setImageData(e.target?.result as string);
-    reader.onerror = () => setFileError('Failed to read the file. Please try again.');
+    reader.onload = async (e) => {
+      const raw = e.target?.result as string;
+      setImageData(await compressImage(raw));
+    };
     reader.readAsDataURL(file);
   };
 
