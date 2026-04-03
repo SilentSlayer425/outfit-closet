@@ -27,6 +27,24 @@ interface UploadModalProps {
   onUpload: (data: { name: string; category: ClothingCategory; imageData: string }) => void;
 }
 
+const readBlobAsDataUrl = (blob: Blob) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target?.result as string);
+    reader.onerror = () => reject(new Error('Failed to read converted image.'));
+    reader.readAsDataURL(blob);
+  });
+
+const convertHeicFile = async (file: File) => {
+  try {
+    const { heicTo } = await import('heic-to/csp');
+    return await heicTo({ blob: file, type: 'image/jpeg', quality: 0.9 });
+  } catch {
+    const fallbackBlob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
+    return Array.isArray(fallbackBlob) ? fallbackBlob[0] : fallbackBlob;
+  }
+};
+
 export function UploadModal({ open, onClose, onUpload }: UploadModalProps) {
   const [name, setName] = useState('');
   const [category, setCategory] = useState<ClothingCategory>('tops');
@@ -44,12 +62,10 @@ export function UploadModal({ open, onClose, onUpload }: UploadModalProps) {
     if (HEIC_EXTENSIONS.some(u => ext.endsWith(u)) || file.type === 'image/heic' || file.type === 'image/heif') {
       setConverting(true);
       try {
-        const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.9 });
-        const resultBlob = Array.isArray(blob) ? blob[0] : blob;
-        const reader = new FileReader();
-        reader.onload = (e) => { setImageData(e.target?.result as string); setConverting(false); };
-        reader.onerror = () => { setFileError('Failed to convert HEIC file.'); setConverting(false); };
-        reader.readAsDataURL(resultBlob);
+        const resultBlob = await convertHeicFile(file);
+        const resultData = await readBlobAsDataUrl(resultBlob);
+        setImageData(resultData);
+        setConverting(false);
       } catch {
         setFileError('Failed to convert HEIC/HEIF file. Please try converting it manually to JPG.');
         setConverting(false);
