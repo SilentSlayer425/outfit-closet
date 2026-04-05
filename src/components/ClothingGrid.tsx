@@ -2,7 +2,7 @@
  * Clothing Grid
  * 
  * Displays uploaded clothing items in a filterable grid.
- * Now supports subcategory filtering and an edit button on each card.
+ * Supports subcategory + custom tag filtering and confirm-on-delete.
  * 
  * Customization:
  *  - Grid columns: change GRID_COLS in src/config.ts
@@ -12,11 +12,13 @@
  *  - Image aspect ratio: change aspect-square to aspect-[3/4] for taller cards
  *  - Category pill colors: change bg-primary / bg-secondary in CategoryPill
  */
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Trash2, Pencil } from 'lucide-react';
 import type { ClothingItem, ClothingCategory } from '@/types/closet';
 import { CATEGORY_LABELS, CATEGORY_ORDER, SUBCATEGORIES } from '@/types/closet';
 import { GRID_COLS, GRID_ITEM_STAGGER } from '@/config';
+import { ConfirmDialog } from '@/components/ConfirmDialog';
 
 interface ClothingGridProps {
   items: ClothingItem[];
@@ -25,42 +27,98 @@ interface ClothingGridProps {
   onRemove: (id: string) => void;
   onSelect?: (item: ClothingItem) => void;
   onEdit?: (item: ClothingItem) => void;
+  onView?: (item: ClothingItem) => void;
   selectable?: boolean;
 }
 
 export function ClothingGrid({
-  items, activeCategory, onCategoryChange, onRemove, onSelect, onEdit, selectable,
+  items, activeCategory, onCategoryChange, onRemove, onSelect, onEdit, onView, selectable,
 }: ClothingGridProps) {
-  const filtered = activeCategory === 'all' ? items : items.filter(i => i.category === activeCategory);
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+
+  // Get all tags (built-in subs + custom) for the active category
+  const availableTags = useMemo(() => {
+    if (activeCategory === 'all') return [];
+    const catItems = items.filter((i) => i.category === activeCategory);
+    const builtIn = SUBCATEGORIES[activeCategory] || [];
+    const customSet = new Set<string>();
+    catItems.forEach((i) => {
+      i.customTags?.forEach((t) => customSet.add(t));
+    });
+    // Merge: built-in subs that have items + all custom tags with items
+    const tags: { label: string; count: number }[] = [];
+    builtIn.forEach((sub) => {
+      const count = catItems.filter((i) => i.subcategory === sub).length;
+      if (count > 0) tags.push({ label: sub, count });
+    });
+    customSet.forEach((tag) => {
+      const count = catItems.filter((i) => i.customTags?.includes(tag)).length;
+      if (count > 0 && !tags.some((t) => t.label === tag)) tags.push({ label: tag, count });
+    });
+    return tags;
+  }, [items, activeCategory]);
+
+  // Filter items by category and active tag
+  const filtered = useMemo(() => {
+    let list = activeCategory === 'all' ? items : items.filter((i) => i.category === activeCategory);
+    if (activeTag) {
+      list = list.filter((i) => i.subcategory === activeTag || i.customTags?.includes(activeTag));
+    }
+    return list;
+  }, [items, activeCategory, activeTag]);
+
+  // Reset tag when category changes
+  const handleCategoryChange = (cat: ClothingCategory | 'all') => {
+    setActiveTag(null);
+    onCategoryChange(cat);
+  };
+
+  const confirmDelete = () => {
+    if (deleteTarget) {
+      onRemove(deleteTarget);
+      setDeleteTarget(null);
+    }
+  };
 
   return (
     <div>
       {/* Category filter pills — scrollable row */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hide">
-        <CategoryPill label="All" active={activeCategory === 'all'} onClick={() => onCategoryChange('all')} />
+        <CategoryPill label="All" active={activeCategory === 'all'} onClick={() => handleCategoryChange('all')} />
         {CATEGORY_ORDER.map((cat) => (
           <CategoryPill
             key={cat}
             label={CATEGORY_LABELS[cat]}
             active={activeCategory === cat}
-            onClick={() => onCategoryChange(cat)}
+            onClick={() => handleCategoryChange(cat)}
             count={items.filter(i => i.category === cat).length}
           />
         ))}
       </div>
 
-      {/* Subcategory pills when a category is selected */}
-      {activeCategory !== 'all' && SUBCATEGORIES[activeCategory]?.length > 0 && (
+      {/* Sub-tag pills when a category is selected */}
+      {activeCategory !== 'all' && availableTags.length > 0 && (
         <div className="flex gap-1.5 overflow-x-auto pb-3 mb-3 scrollbar-hide">
-          {SUBCATEGORIES[activeCategory].map((sub) => {
-            const count = items.filter(i => i.category === activeCategory && i.subcategory === sub).length;
-            if (count === 0) return null;
-            return (
-              <span key={sub} className="shrink-0 px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-                {sub} <span className="opacity-60">{count}</span>
-              </span>
-            );
-          })}
+          <button
+            onClick={() => setActiveTag(null)}
+            className={`shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+              !activeTag ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+            }`}
+          >
+            All
+          </button>
+          {availableTags.map(({ label, count }) => (
+            <button
+              key={label}
+              onClick={() => setActiveTag(activeTag === label ? null : label)}
+              className={`shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                activeTag === label ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground hover:bg-muted/80'
+              }`}
+            >
+              {label} <span className="opacity-60">{count}</span>
+            </button>
+          ))}
         </div>
       )}
 
@@ -80,7 +138,10 @@ export function ClothingGrid({
               className={`group relative rounded-xl overflow-hidden bg-card shadow-soft ${
                 selectable ? 'cursor-pointer hover:shadow-card transition-shadow' : ''
               }`}
-              onClick={() => selectable && onSelect?.(item)}
+              onClick={() => {
+                if (selectable) { onSelect?.(item); return; }
+                onView?.(item);
+              }}
             >
               {/* Image container */}
               <div className="aspect-square p-2">
@@ -104,7 +165,7 @@ export function ClothingGrid({
                 )}
               </div>
               {!selectable && (
-                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   {/* Edit button */}
                   {onEdit && (
                     <button
@@ -114,9 +175,9 @@ export function ClothingGrid({
                       <Pencil className="w-3.5 h-3.5" />
                     </button>
                   )}
-                  {/* Delete button */}
+                  {/* Delete button — triggers confirm dialog */}
                   <button
-                    onClick={(e) => { e.stopPropagation(); onRemove(item.id); }}
+                    onClick={(e) => { e.stopPropagation(); setDeleteTarget(item.id); }}
                     className="p-1.5 rounded-full bg-card/80 backdrop-blur-sm hover:bg-destructive hover:text-destructive-foreground"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -127,6 +188,14 @@ export function ClothingGrid({
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        title="Delete Item"
+        message="Are you sure you want to delete this item? This cannot be undone."
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }
