@@ -238,7 +238,7 @@ export default function Index({ user, onSignOut }: IndexProps) {
 
           {tab === 'outfits' && (
             <motion.div key="outfits" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: PAGE_TRANSITION_DURATION }}>
-              <SavedOutfits outfits={outfits} getItemById={getItemById} onRemove={removeOutfit} onLoad={handleLoadOutfit} />
+              <SavedOutfits outfits={outfits} getItemById={getItemById} onRemove={removeOutfit} onLoad={handleLoadOutfit} onEditItem={setEditItem} onDeleteItem={removeItem} />
             </motion.div>
           )}
 
