@@ -20,10 +20,12 @@ import { AppNav } from '@/components/AppNav';
 import type { Tab } from '@/components/AppNav';
 import { UploadModal } from '@/components/UploadModal';
 import { EditItemModal } from '@/components/EditItemModal';
+import { ItemDetailModal } from '@/components/ItemDetailModal';
 import { ClothingGrid } from '@/components/ClothingGrid';
 import { OutfitCanvas } from '@/components/OutfitCanvas';
 import { SavedOutfits } from '@/components/SavedOutfits';
 import { DonationPage } from '@/components/DonationPage';
+import { WeatherWidget } from '@/components/WeatherWidget';
 import { CATEGORY_Y_DEFAULTS, CATEGORY_X_DEFAULTS, PAGE_TRANSITION_DURATION } from '@/config';
 import type { ClothingCategory, ClothingItem, OutfitItem, Outfit } from '@/types/closet';
 import type { GoogleUser } from '@/hooks/useGoogleAuth';
@@ -46,15 +48,22 @@ export default function Index({ user, onSignOut }: IndexProps) {
   const [tab, setTab] = useState<Tab>('closet');
   const [uploadOpen, setUploadOpen] = useState(false);
   const [editItem, setEditItem] = useState<ClothingItem | null>(null);
+  const [viewItem, setViewItem] = useState<ClothingItem | null>(null);
   const [activeCategory, setActiveCategory] = useState<ClothingCategory | 'all'>('all');
   const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([]);
+  const [weatherCity, setWeatherCity] = useState<string | null>(null);
 
   // Load from Drive on mount
   useEffect(() => {
     if (!ready) return;
     loadFromDrive().then((data) => {
-      if (data && (data.items?.length || data.outfits?.length)) {
-        replaceAll(data.items || [], data.outfits || []);
+      if (data) {
+        if (data.items?.length || data.outfits?.length) {
+          replaceAll(data.items || [], data.outfits || []);
+        }
+        if ((data as any).weatherCity) {
+          setWeatherCity((data as any).weatherCity);
+        }
       }
     });
   }, [loadFromDrive, ready, replaceAll]);
@@ -64,11 +73,11 @@ export default function Index({ user, onSignOut }: IndexProps) {
     if (!ready) return;
     const timer = setTimeout(() => {
       if (items.length > 0 || outfits.length > 0) {
-        saveToDrive({ items, outfits });
+        saveToDrive({ items, outfits, weatherCity } as any);
       }
     }, 2000);
     return () => clearTimeout(timer);
-  }, [items, outfits, saveToDrive, ready]);
+  }, [items, outfits, weatherCity, saveToDrive, ready]);
 
   const handleUpload = useCallback((data: { name: string; category: ClothingCategory; subcategory?: string; customTags?: string[]; imageData: string }) => {
     addItem(data);
@@ -101,10 +110,13 @@ export default function Index({ user, onSignOut }: IndexProps) {
     setOutfitItems([]);
   }, [outfitItems, saveOutfit]);
 
-  /** Load a saved outfit back into the builder with its saved positions */
   const handleLoadOutfit = useCallback((outfit: Outfit) => {
     setOutfitItems(outfit.items.map((oi) => ({ ...oi })));
     setTab('builder');
+  }, []);
+
+  const handleWeatherCityChange = useCallback((city: string) => {
+    setWeatherCity(city);
   }, []);
 
   const headerTitle: Record<Tab, string> = {
@@ -164,14 +176,17 @@ export default function Index({ user, onSignOut }: IndexProps) {
                 onCategoryChange={setActiveCategory}
                 onRemove={removeItem}
                 onEdit={setEditItem}
+                onView={setViewItem}
               />
             </motion.div>
           )}
 
           {tab === 'builder' && (
             <motion.div key="builder" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: PAGE_TRANSITION_DURATION }}>
+              {/* Weather widget — collapsible */}
+              <WeatherWidget savedCity={weatherCity} onCityChange={handleWeatherCityChange} />
+
               {isMobile ? (
-                /* Mobile: canvas on top, clothing grid below */
                 <div className="flex flex-col gap-4">
                   <div className="rounded-2xl border border-border p-4">
                     <OutfitCanvas
@@ -195,7 +210,6 @@ export default function Index({ user, onSignOut }: IndexProps) {
                   </div>
                 </div>
               ) : (
-                /* Desktop: clothing 2/3 left, canvas 1/3 right */
                 <div className="flex gap-4">
                   <div className="w-2/3 overflow-y-auto">
                     <h3 className="mb-3 font-heading font-semibold text-foreground">Add from closet</h3>
@@ -245,6 +259,7 @@ export default function Index({ user, onSignOut }: IndexProps) {
 
       <UploadModal open={uploadOpen} onClose={() => setUploadOpen(false)} onUpload={handleUpload} />
       <EditItemModal open={!!editItem} item={editItem} onClose={() => setEditItem(null)} onSave={updateItem} />
+      <ItemDetailModal open={!!viewItem} item={viewItem} onClose={() => setViewItem(null)} />
       <AppNav active={tab} onChange={setTab} />
     </div>
   );
