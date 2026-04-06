@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 
 /** Number of hours shown in forecast — change to show more/fewer */
-const FORECAST_HOURS = 12;
+const FORECAST_HOURS = 24;
 
 interface GeoResult {
   name: string;
