@@ -211,7 +211,7 @@ export default function Home({ user, onSignIn, onSignOut, darkMode, toggleDarkMo
                   size="lg"
                   className="gap-2 rounded-xl px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base font-semibold w-full sm:w-auto"
                 >
-                  Get Started Free <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                  Get Started<ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 </Button>
               )}
               <Link to="/donate" className="w-full sm:w-auto">
