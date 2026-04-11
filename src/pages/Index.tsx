@@ -9,7 +9,7 @@
  *  - Header blur: change backdrop-blur-md intensity
  *  - Footer text: change the analytics notice at the bottom
  */
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Cloud, CloudOff, LogOut, Trash2, RefreshCw, Moon, Sun, FileText, Shield } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -58,6 +58,9 @@ export default function Index({ user, onSignOut, darkMode, setDarkMode, toggleDa
   const [activeCategory, setActiveCategory] = useState<ClothingCategory | 'all'>('all');
   const [outfitItems, setOutfitItems] = useState<OutfitItem[]>([]);
   const [weatherCity, setWeatherCity] = useState<string | null>(null);
+  const [weatherLat, setWeatherLat]   = useState<number | null>(null);
+  const [weatherLon, setWeatherLon]   = useState<number | null>(null);
+  const driveLoaded = useRef(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [confirmDeleteAll, setConfirmDeleteAll] = useState(false);
 
@@ -80,22 +83,25 @@ export default function Index({ user, onSignOut, darkMode, setDarkMode, toggleDa
         }
         if (data.weatherCity) {
           setWeatherCity(data.weatherCity);
+          setWeatherLat(data.weatherLat ?? null); // add
+          setWeatherLon(data.weatherLon ?? null); // add
         }
         if (data.darkMode !== undefined) {
           setDarkMode(data.darkMode);
         }
       }
+      driveLoaded.current = true;
     });
   }, [loadFromDrive, ready, replaceAll, setDarkMode]);
 
   // Auto-save to Drive
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !driveLoaded.current) return; // ← add !driveLoaded.current
     const timer = setTimeout(() => {
-      saveToDrive({ items, outfits, weatherCity, darkMode } as any);
+      saveToDrive({ items, outfits, weatherCity, weatherLat, weatherLon, darkMode } as any); // ← add weatherLat, weatherLon
     }, 2000);
     return () => clearTimeout(timer);
-  }, [items, outfits, weatherCity, darkMode, saveToDrive, ready]);
+  }, [items, outfits, weatherCity, weatherLat, weatherLon, darkMode, saveToDrive, ready]); // ← add weatherLat, weatherLon
 
   const handleUpload = useCallback((data: { name: string; category: ClothingCategory; subcategory?: string; customTags?: string[]; description?: string; imageData: string }) => {
     addItem(data);
@@ -133,8 +139,10 @@ export default function Index({ user, onSignOut, darkMode, setDarkMode, toggleDa
     setTab('builder');
   }, []);
 
-  const handleWeatherCityChange = useCallback((city: string) => {
+  const handleWeatherCityChange = useCallback((city: string, lat: number, lon: number) => {
     setWeatherCity(city);
+    setWeatherLat(lat); // add
+    setWeatherLon(lon); // add
   }, []);
 
   const handleDeleteAllData = useCallback(() => {
@@ -266,7 +274,7 @@ export default function Index({ user, onSignOut, darkMode, setDarkMode, toggleDa
           {tab === 'builder' && (
             <motion.div key="builder" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: PAGE_TRANSITION_DURATION }}>
               {/* Weather widget — collapsible */}
-              <WeatherWidget savedCity={weatherCity} onCityChange={handleWeatherCityChange} />
+              <WeatherWidget savedCity={weatherCity} savedLat={weatherLat} savedLon={weatherLon} onCityChange={handleWeatherCityChange} />
 
               {isMobile ? (
                 <div className="flex flex-col gap-4">

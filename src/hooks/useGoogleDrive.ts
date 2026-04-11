@@ -6,7 +6,7 @@
  * 
  * Customization: Change folder/file names in src/config.ts
  */
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { DRIVE_FOLDER_NAME, DRIVE_DATA_FILE } from '@/config';
 import type { ClothingItem, Outfit } from '@/types/closet';
 
@@ -15,6 +15,8 @@ interface DriveData {
   outfits: Outfit[];
   darkMode?: boolean;
   weatherCity?: string;
+  weatherLat?: number; // add
+  weatherLon?: number; // add
 }
 
 async function driveRequest(url: string, token: string, options: RequestInit = {}) {
@@ -129,5 +131,5 @@ export function useGoogleDrive(accessToken: string | undefined) {
     }
   }, [accessToken]);
 
-  return { saveToDrive: saveToD, loadFromDrive, syncing, lastSync };
+  return { saveToDrive: saveToD, loadFromDrive, syncing, lastSync};
 }
