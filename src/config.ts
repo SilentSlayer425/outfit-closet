@@ -13,7 +13,7 @@ export const GOOGLE_CLIENT_ID = '98273814331-4lk1ijffj8juno7d4fdclh17rmjon8uh.ap
 
 // Google Drive folder name where closet data is stored
 // Change this to use a different folder name in the user's Drive
-export const DRIVE_FOLDER_NAME = 'OutfitClosetApp';
+export const DRIVE_FOLDER_NAME = 'OutfitCanvasApp';
 
 // File name for the JSON data file in Google Drive
 export const DRIVE_DATA_FILE = 'closet-data.json';

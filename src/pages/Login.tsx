@@ -74,7 +74,7 @@ export default function Login({ onSignIn, loading, darkMode, toggleDarkMode, use
 
         {/* App title — uses heading font from index.css (Playfair Display) */}
         <h1 className="text-2xl sm:text-3xl font-heading font-bold text-foreground mb-2">
-          Outfit
+          Outfit Canvas
         </h1>
 
         {/* Subtitle — change text-muted-foreground for different text color */}

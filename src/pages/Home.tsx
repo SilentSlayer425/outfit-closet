@@ -78,7 +78,7 @@ export default function Home({ user, onSignIn, onSignOut, darkMode, toggleDarkMo
             <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
               <Shirt className="w-4 h-4 sm:w-6 sm:h-6 text-primary" />
             </div>
-            <span className="text-lg sm:text-xl font-heading font-bold text-foreground">Outfit Closet</span>
+            <span className="text-lg sm:text-xl font-heading font-bold text-foreground">Outfit Canvas</span>
           </Link>
 
           {/* Navigation */}
@@ -452,7 +452,7 @@ export default function Home({ user, onSignIn, onSignOut, darkMode, toggleDarkMo
                 <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-primary/10 flex items-center justify-center">
                   <Shirt className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                 </div>
-                <span className="text-lg sm:text-xl font-heading font-bold text-foreground">Outfit</span>
+                <span className="text-lg sm:text-xl font-heading font-bold text-foreground">Outfit Canvas</span>
               </div>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                 Your personal closet, organized and accessible from anywhere.
@@ -498,7 +498,7 @@ export default function Home({ user, onSignIn, onSignOut, darkMode, toggleDarkMo
 
           {/* Copyright */}
           <div className="pt-6 sm:pt-8 border-t border-border text-center text-xs sm:text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} Outfit. Your data is stored in your Google Drive.</p>
+            <p>© {new Date().getFullYear()} Outfit Canvas. Your data is stored in your Google Drive.</p>
           </div>
         </div>
       </footer>

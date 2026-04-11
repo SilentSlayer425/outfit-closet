@@ -39,7 +39,7 @@ const handleBack = () => {
           <section>
             <h2 className="text-lg sm:text-xl md:text-2xl font-heading font-semibold mb-2 sm:mb-3">1. Introduction</h2>
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-              We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we handle your information when you use our digital closet application ("Service").
+              We respect your privacy and are committed to protecting your personal data. This privacy policy explains how we handle your information when you use our digital closet application.
             </p>
           </section>
 
