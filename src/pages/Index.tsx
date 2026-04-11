@@ -12,7 +12,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Cloud, CloudOff, LogOut, Trash2, RefreshCw, Moon, Sun, FileText, Shield } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ConfirmDialog';
 import { useCloset } from '@/hooks/useCloset';
@@ -31,6 +31,7 @@ import { WeatherWidget } from '@/components/WeatherWidget';
 import { CATEGORY_Y_DEFAULTS, CATEGORY_X_DEFAULTS, PAGE_TRANSITION_DURATION } from '@/config';
 import type { ClothingCategory, ClothingItem, OutfitItem, Outfit } from '@/types/closet';
 import type { GoogleUser } from '@/hooks/useGoogleAuth';
+import { goToSubdomain } from '@/utils/navigation';
 
 const pageVariants = {
   initial: { opacity: 0, x: 20 },
@@ -51,8 +52,8 @@ export default function Index({ user, onSignOut, darkMode, setDarkMode, toggleDa
   const { saveToDrive, loadFromDrive, syncing, lastSync } = useGoogleDrive(user.accessToken);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>('closet');
-  const [uploadOpen, setUploadOpen] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [tab, setTab] = useState<Tab>((searchParams.get('tab') as Tab) || 'closet');  const [uploadOpen, setUploadOpen] = useState(false);
   const [editItem, setEditItem] = useState<ClothingItem | null>(null);
   const [viewItem, setViewItem] = useState<ClothingItem | null>(null);
   const [activeCategory, setActiveCategory] = useState<ClothingCategory | 'all'>('all');
@@ -236,7 +237,7 @@ export default function Index({ user, onSignOut, darkMode, setDarkMode, toggleDa
                       <RefreshCw className="w-4 h-4" /> Switch Account
                     </button>
                     <button
-                      onClick={() => { setProfileMenuOpen(false); setConfirmDeleteAll(true); }}
+                      onClick={() => { setProfileMenuOpen(false); goToSubdomain('delete'); }}
                       className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-destructive hover:bg-destructive/10 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" /> Delete All Data
