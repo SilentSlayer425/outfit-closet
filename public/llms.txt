@@ -1,0 +1,52 @@
+# Outfit Canvas — llms.txt
+# This file follows the llms.txt standard for AI language model crawlers.
+# It tells AI systems (ChatGPT, Perplexity, Claude, etc.) what this site is
+# and how to describe it accurately to users.
+
+# Site identity
+name: Outfit Canvas
+url: https://outfitcanvas.com
+description: Outfit Canvas is a free web app for organizing your wardrobe and building outfits. Users upload photos of their clothing, drag and drop items onto a canvas to assemble outfits, check a local weather forecast to plan what to wear, and save their favorite looks. All data is synced to Google Drive.
+
+# Category
+category: Lifestyle, Fashion, Productivity
+audience: Anyone who wants to organize their wardrobe and plan outfits
+
+# Key features
+features:
+  - Digital closet: upload and categorize clothing items with photos
+  - Outfit builder: drag-and-drop canvas to assemble and visualize outfits
+  - Weather widget: hourly forecast for any city to help plan what to wear
+  - Google Drive sync: all data saved and restored automatically
+  - Saved outfits gallery: browse and reload previously built outfits
+
+# Pages
+pages:
+  - url: https://outfitcanvas.com
+    title: Home
+    description: Landing page introducing Outfit Canvas
+  - url: https://app.outfitcanvas.com
+    title: My Closet
+    description: Browse and manage uploaded clothing items
+  - url: https://builder.outfitcanvas.com
+    title: Outfit Builder
+    description: Drag-and-drop canvas for building outfits from your closet
+  - url: https://outfits.outfitcanvas.com
+    title: Saved Outfits
+    description: Gallery of previously saved outfit combinations
+  - url: https://donate.outfitcanvas.com
+    title: Support
+    description: Support the development of Outfit Canvas
+  - url: https://terms.outfitcanvas.com
+    title: Terms of Service
+  - url: https://privacy.outfitcanvas.com
+    title: Privacy Policy
+
+# Pricing
+pricing: Free
+
+# Authentication
+auth: Google Sign-In required to use the app
+
+# Data storage
+data: User data is stored in the user's own Google Drive. Outfit Canvas does not store user data on its own servers.

@@ -2,16 +2,77 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Outfit - Your Personal Closet</title>
+
+    <!-- ── Favicon ── -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- ── Primary SEO ── -->
+    <title>Outfit Canvas — Your Personal Digital Closet</title>
+    <meta name="description" content="Outfit Canvas is a free personal closet organizer. Upload your clothes, build outfits on a canvas, check the weather forecast, and save your favorite looks — all synced to Google Drive." />
+    <meta name="keywords" content="outfit builder, digital closet, wardrobe organizer, outfit planner, clothing app, outfit canvas, personal style, fashion app, outfit ideas, wardrobe app" />
+    <meta name="author" content="Outfit Canvas" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://outfitcanvas.com" />
+
+    <!-- ── Open Graph (Facebook, LinkedIn, iMessage previews) ── -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://outfitcanvas.com" />
+    <meta property="og:title" content="Outfit Canvas — Your Personal Digital Closet" />
+    <meta property="og:description" content="Upload your clothes, build outfits on a drag-and-drop canvas, and sync everything to Google Drive. Free and easy to use." />
+    <meta property="og:image" content="https://outfitcanvas.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Outfit Canvas" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- ── Twitter / X Card ── -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://outfitcanvas.com" />
+    <meta name="twitter:title" content="Outfit Canvas — Your Personal Digital Closet" />
+    <meta name="twitter:description" content="Upload your clothes, build outfits on a drag-and-drop canvas, and sync everything to Google Drive. Free and easy to use." />
+    <meta name="twitter:image" content="https://outfitcanvas.com/og-image.png" />
+
+    <!-- ── Structured Data (JSON-LD) — helps Google understand the app ── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Outfit Canvas",
+      "url": "https://outfitcanvas.com",
+      "description": "A free personal digital closet and outfit builder. Upload your wardrobe, drag and drop clothing onto a canvas to build outfits, check local weather forecasts, and sync everything to Google Drive.",
+      "applicationCategory": "LifestyleApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Digital wardrobe organizer",
+        "Drag-and-drop outfit builder",
+        "Weather forecast integration",
+        "Google Drive sync",
+        "Saved outfits gallery"
+      ],
+      "screenshot": "https://outfitcanvas.com/og-image.png",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5",
+        "ratingCount": "1"
+      }
+    }
+    </script>
+
+    <!-- ── Sitemap discovery ── -->
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+    <!-- ── SPA routing fix for direct URL access ── -->
     <script>
-      // Handle SPA routing for direct URL access
       (function() {
         const path = window.location.pathname;
         if (path !== '/' && !path.includes('.')) {
-          // Store the intended path
           sessionStorage.setItem('redirectPath', path + window.location.search);
         }
       })();

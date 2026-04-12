@@ -1,14 +1,10 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# robots.txt for outfitcanvas.com
+# Allows all search engines and AI crawlers to index the site
 
 User-agent: *
 Allow: /
+
+# Block the delete page from being indexed — no reason for it to appear in search
+Disallow: /delete
+
+Sitemap: https://outfitcanvas.com/sitemap.xml
