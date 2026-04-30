@@ -6,7 +6,7 @@
  * Customization:
  *  - To skip Google login during dev, hardcode a user object
  */
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, Navigate, useNavigate } from "react-router-dom";
 import { Analytics } from '@vercel/analytics/react';
@@ -47,7 +47,10 @@ function getSubdomain(): string {
 /** Reads the subdomain on mount and sends React Router to the right page */
 function SubdomainRedirector() {
   const navigate = useNavigate();
+  const hasRun = useRef(false);
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
     const subdomain = getSubdomain();
     const target = SUBDOMAIN_PATHS[subdomain];
     if (target && target !== '/') {
