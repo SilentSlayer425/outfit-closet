@@ -5,7 +5,6 @@
  * Includes dark mode, sign in, and links to all pages
  */
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Shirt, 
@@ -214,26 +213,6 @@ export default function Home({ user, onSignIn, onSignOut, darkMode, toggleDarkMo
               </Button>
             </div>
  
-            {/* Product Hunt Badge */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="mt-8 flex justify-center"
-            >
-              <a
-                href="https://www.producthunt.com/products/outfit-canvas?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-outfit-canvas"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img
-                  alt="Outfit Canvas - Never Wonder What to Wear | Product Hunt"
-                  src={`https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1122172&theme=${darkMode ? 'dark' : 'light'}&t=${Date.now()}`}
-                  width="250"
-                  height="54"
-                />
-              </a>
-            </motion.div>
           </motion.div>
         </div>
  
@@ -469,25 +448,6 @@ export default function Home({ user, onSignIn, onSignOut, darkMode, toggleDarkMo
                 )}
               </div>
             </div>
-          </div>
- 
-          {/* Copyright + PH badge */}
-          <div className="pt-6 sm:pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              © {new Date().getFullYear()} Outfit Canvas. Your data is stored in your Google Drive.
-            </p>
-            <a
-              href="https://www.producthunt.com/products/outfit-canvas?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-outfit-canvas"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                alt="Outfit Canvas - Never Wonder What to Wear | Product Hunt"
-                src={`https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1122172&theme=${darkMode ? 'dark' : 'light'}`}
-                width="200"
-                height="43"
-              />
-            </a>
           </div>
         </div>
       </footer>
