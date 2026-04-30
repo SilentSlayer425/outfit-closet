@@ -81,19 +81,35 @@ const App = () => {
 
             {/* Auth routes */}
             <Route path="/login" element={
-              !user ? (
-                <Login onSignIn={signIn} loading={loading} darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-              ) : (
-                <Navigate to="/app" replace />
+              loading ? null : (
+                !user ? (
+                  <Login
+                    onSignIn={signIn}
+                    loading={loading}
+                    darkMode={darkMode}
+                    toggleDarkMode={toggleDarkMode}
+                    user={user}
+                  />
+                ) : (
+                  <Navigate to="/app" replace />
+                )
               )
             } />
 
             {/* Protected app route */}
             <Route path="/app" element={
-              user ? (
-                <Index user={user} onSignOut={signOut} darkMode={darkMode} setDarkMode={setDarkMode} toggleDarkMode={toggleDarkMode} />
-              ) : (
-                <Navigate to="/login" replace />
+              loading ? null : (
+                user ? (
+                  <Index
+                    user={user}
+                    onSignOut={signOut}
+                    darkMode={darkMode}
+                    setDarkMode={setDarkMode}
+                    toggleDarkMode={toggleDarkMode}
+                  />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
               )
             } />
 

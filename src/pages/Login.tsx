@@ -28,13 +28,6 @@ interface LoginPageProps {
 export default function Login({ onSignIn, loading, darkMode, toggleDarkMode, user }: LoginPageProps) {
   const navigate = useNavigate();
 
-  // Redirect to app if already logged in
-  useEffect(() => {
-    if (user) {
-      navigate('/app');
-    }
-  }, [user, navigate]);
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-3 sm:p-4 relative">
       {/* Dark mode toggle - top right */}
