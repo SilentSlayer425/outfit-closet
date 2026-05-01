@@ -24,7 +24,7 @@ function isRootHost(hostname: string) {
 }
 
 function isProdHost(hostname: string) {
-  return hostname.endsWith('outfitcanvas.com');
+  return isRootHost(hostname) || hostname.endsWith('.outfitcanvas.com');
 }
 
 /** Navigate to a subdomain on prod, or fall back to path routing in dev/root */
@@ -33,8 +33,9 @@ export function goToSubdomain(subdomain: string) {
   const path = SUBDOMAIN_PATHS[subdomain] ?? '/';
   const isProd = isProdHost(hostname);
   const isRoot = isRootHost(hostname);
+  const usePathRouting = !isProd || isRoot;
 
-  if (!isProd || isRoot) {
+  if (usePathRouting) {
     window.location.href = path;
     return;
   }
