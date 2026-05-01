@@ -33,9 +33,8 @@ export function goToSubdomain(subdomain: string) {
   const path = SUBDOMAIN_PATHS[subdomain] ?? '/';
   const isProd = isProdHost(hostname);
   const isRoot = isRootHost(hostname);
-  const usePathRouting = !isProd || isRoot;
 
-  if (usePathRouting) {
+  if (!isProd || isRoot) {
     window.location.href = path;
     return;
   }
