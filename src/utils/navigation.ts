@@ -17,13 +17,27 @@ const SUBDOMAIN_PATHS: Record<string, string> = {
   delete:  '/delete',
 };
 
-/** Navigate to a subdomain on prod, or fall back to path routing in dev */
+const ROOT_HOSTS = new Set(['outfitcanvas.com', 'www.outfitcanvas.com']);
+
+function isRootHost(hostname: string) {
+  return ROOT_HOSTS.has(hostname);
+}
+
+function isProdHost(hostname: string) {
+  return isRootHost(hostname) || hostname.endsWith('.outfitcanvas.com');
+}
+
+/** Navigate to a subdomain on prod, or fall back to path routing in dev/root */
 export function goToSubdomain(subdomain: string) {
-  const isProd = window.location.hostname.includes('outfitcanvas.com');
-  if (isProd) {
-    window.location.href = `https://${subdomain}.outfitcanvas.com`;
-  } else {
-    const path = SUBDOMAIN_PATHS[subdomain] ?? '/';
+  const hostname = window.location.hostname;
+  const path = SUBDOMAIN_PATHS[subdomain] ?? '/';
+  const isProd = isProdHost(hostname);
+  const isRoot = isRootHost(hostname);
+
+  if (!isProd || isRoot) {
     window.location.href = path;
+    return;
   }
+
+  window.location.href = `https://${subdomain}.outfitcanvas.com`;
 }
